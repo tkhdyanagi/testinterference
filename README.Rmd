@@ -1,0 +1,70 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# testinterference: Randomization Test for the Specification of Interference Structure
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The **testinterference** package provides tools to test several hypotheses about spillover effects.
+Specifically, the package enables to perform randomization tests on whether or not the following null hypotheses are plausible:
+
+- **Fisher**:
+One's outcome does not depend on one's own treatment (i.e., Fisher's sharp null hypothesis).
+- **SUTVA**:
+One's outcome is determined by one's own treatment (i.e., the stable unit treatment value assumption).
+- **Exposure 1**:
+One's outcome is determined by whether there is at least one treated unit in one's neighborhood including oneself.
+- **Exposure 2**:
+One's outcome is determined by one's own treatment and whether there is at least one treated peer.
+
+The testing procedures are developed by [Hoshino and Yanagi (2023) "Randomization test for the specification of interference structure"](https://doi.org/10.48550/arXiv.2301.05580).
+
+## Installation
+
+Get the package from GitHub:
+
+```{r, eval = F, echo = T}
+# install.packages("devtools") # if necessary
+devtools::install_github("tkhdyanagi/testinterference", build_vignettes = TRUE)
+```
+
+## Vignettes
+
+For more details, see the package vignettes with:
+
+```{r, eval = FALSE}
+# Getting Started with the testinterference Package
+vignette("testinterference")
+
+# Testing Procedure: Fisher's Sharp Null Hypothesis
+vignette("Fisher", package = "testinterference")
+
+# Testing Procedure: SUTVA
+vignette("SUTVA", package = "testinterference")
+
+# Testing Procedure: Exposure 1
+vignette("exposure1", package = "testinterference")
+
+# Testing Procedure: Exposure 2
+vignette("exposure2", package = "testinterference")
+```
+
+## References
+
+- Hoshino, T. and Yanagi, T., 2023. 
+Randomization test for the specification of interference structure
+arXiv preprint arXiv:2301.05580.
+[Link](https://doi.org/10.48550/arXiv.2301.05580)

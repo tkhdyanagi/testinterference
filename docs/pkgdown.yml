@@ -1,0 +1,11 @@
+pandoc: 3.1.1
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  exposure1: exposure1.html
+  exposure2: exposure2.html
+  Fisher: Fisher.html
+  SUTVA: SUTVA.html
+  testinterference: testinterference.html
+last_built: 2023-06-18T06:46Z
+

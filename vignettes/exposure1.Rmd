@@ -1,0 +1,166 @@
+---
+title: "Testing Procedure: Exposure 1"
+author: "Tadao Hoshino (thoshino@waseda.jp), Takahide Yanagi (yanagi@econ.kyoto-u.ac.jp)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Testing Procedure: Exposure 1}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7.5, 
+  fig.height = 5 
+)
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+## Introduction
+
+This vignette describes the testing procedure implemented in the `testinterference()` function when `hypothesis = "exposure1"`.
+
+## Setup
+
+Consider a finite population of $n$ units, $[n] = \{ 1, \dots, n \}$.
+
+Let $\mathbf{Z} = (Z_1, \dots, Z_n)$ denote the $n$-dimensional binary vector of realized treatment assignments.
+Suppose that $\mathbf{Z} \sim \mathbb{P}_{\mathbf{Z}}$ for a known assignment probability $\mathbb{P}_{\mathbf{Z}}$ (i.e., the experimental design).
+For instance, $\mathbb{P}_{\mathbf{Z}}$ may be Bernoulli randomization, complete randomization, stratified randomization, or other experimental designs.
+We write the set of all possible assignment patterns $\mathcal{Z} = \{ \mathbf{z} \in \{ 0, 1 \}^n: \mathbb{P}_{\mathbf{Z}}(\mathbf{z}) > 0 \}$.
+
+Let $\mathbf{Y} = (Y_1, \dots, Y_n)$, where $Y_i$ denotes the outcome variable for unit $i$.
+
+Let $\mathbf{A} = (A_{ij})_{i,j \in [n]}$ be the adjacency matrix, where $A_{ij} \in \{ 0, 1 \}$ represents whether $j$ affects $i$.
+We set $A_{ii} = 0$ for all $i$.
+For each $i$, the set of interacting peers is defined as $\mathcal{P}_i = \{ j \in [n]: A_{ij} = 1 \}$.
+Let $\bar{\mathcal{P}}_i = \mathcal{P}_i \cup \{ i \}$ denote the unit $i$'s neighborhood.
+
+## Null Hypothesis
+
+For each treatment assignment $\mathbf{z} = (z_1, \dots, z_n)$, we consider the two exposure mappings:
+\begin{align*}
+  E_i^0(\mathbf{z}) & = \max_{j \in \bar{\mathcal{P}}_i} z_j, \\
+  E_i^1(\mathbf{z}) & = \left( z_i, \; \max_{j \in \mathcal{P}_i} z_j \right).
+\end{align*}
+Here, the former exposure mapping indicates whether there is at least one treated unit in the neighborhood, and the second element of the latter exposure mapping corresponds to whether there is at least one treated peer.
+Let $E_i^0 = E_i^0(\mathbf{Z})$ and $E_i^1 = E_i^1(\mathbf{Z})$ denote the exposures computed with the realized treatment assignments $\mathbf{Z}$.
+
+The exposure mapping $E^0$ is said to be *correct* if the potential outcome given $E_i^0 = e^0$ is well defined for any $i$.
+A key insight behind the randomization test discussed below is that, if $E^0$ is correct, then $E^1$ is also correct.
+Under the null hypothesis, we write the potential outcome given $E_i^1 = e^1$ as $y_i^1(e^1)$.
+
+The null hypothesis of interest is
+\begin{align*}
+	\mathbb{H}_0: \quad 
+	\text{The exposure mapping $E^0$ is correct.}
+\end{align*}
+This states that the outcome for each unit is determined by whether there is at least one treated unit in one's neighborhood.
+If we find statistical evidence against this hypothesis, it implies that unit's own treatment should be distinguished from others' treatments.
+
+## Randomization Test
+
+The main idea behind testing the null hypothesis is to check whether the outcome distributions are the same between the groups with  $E_i^1 = (1, 0)$, $E_i^1 = (0, 1)$, and $E_i^1 = (1, 1)$.
+
+To be specific, in line with the notation in [Hoshino and Yanagi (2023)](https://doi.org/10.48550/arXiv.2301.05580), let $\tilde{\mathcal{E}}_i^1 = \{ (1, 0), (0, 1), (1, 1) \}$ for each $i$ such that $|\mathcal{P}_i| > 0$ and $E_i^0 = 1$.
+Then, under the null hypothesis $\mathbb{H}_0$, we have
+\begin{align*}
+	Y_i = y_i^1(e^1)
+	\quad 
+	\text{for all $e^1 \in \tilde{\mathcal{E}}_i^1$.}
+\end{align*}
+Thus, the values of all $\{ y_i^1(e^1): e^1 \in \tilde{\mathcal{E}}_i^1 \}$ are identically imputable as $Y_i$.
+Given this, using the test statistics introduced below, we can test whether the following equality under $\mathbb{H}_0$ is true:
+\begin{align*}
+	y_i^1(e_j^1) = y_i^1(e_k^1)
+	\quad 
+	\text{for all $e_j^1, e_k^1 \in \tilde{\mathcal{E}}_i^1$.}
+\end{align*}
+We reject the null hypothesis if we find statistical evidence against this equality.
+
+As discussed in [Hoshino and Yanagi (2023)](https://doi.org/10.48550/arXiv.2301.05580), 
+we must carefully select the appropriate subsets of units and treatment assignments, 
+which we call the *focal sub-population* (the set of *focal units*) and *focal assignments*, respectively.
+For the null hypothesis considered here, we can construct the focal sub-population $\mathcal{S}$ as an appropriate subset of 
+\begin{align*}
+  \mathcal{N}(3) = \left\{ i \in [n]: |\mathcal{P}_i| > 0, E_i^0 = 1 \right\}.
+\end{align*}
+Then, for given $\mathcal{S}$, the set of focal assignments is defined as
+\begin{align*}
+  \mathcal{C}^{\mathcal{S}} = \left\{ \mathbf{z} \in \mathcal{Z}: \max_{j \in \bar{\mathcal{P}}_i} z_j = \max_{j \in \bar{\mathcal{P}}_i} Z_j \; \text{for all $i \in \mathcal{S}$} \right\}.
+\end{align*}
+See [Hoshino and Yanagi (2023)](https://doi.org/10.48550/arXiv.2301.05580) for more details.
+
+Let $\mathbf{Y}_{\mathcal{S}} = (Y_i)_{i \in \mathcal{S}}$ denote the vector that collects the outcomes for focal units.
+
+The testing procedure is as follows:
+
+1. Choose a test statistic $T(\mathbf{z}, \mathbf{y}_{\mathcal{S}})$.
+2. Compute $T(\mathbf{Z}, \mathbf{Y}_{\mathcal{S}})$ with the realized treatment assignment $\mathbf{Z}$ and the observed outcome vector $\mathbf{Y}_{\mathcal{S}}$ for focal units.
+3. Draw $\mathbf{z}^{(r)}$ independently from $\mathbb{P}_{\mathbf{Z} | \mathbf{Z} \in \mathcal{C}^{\mathcal{S}}}$.
+4. Compute $T(\mathbf{z}^{(r)}, \mathbf{Y}_{\mathcal{S}})$ under $\mathbb{H}_0$.
+5. Repeat the above two steps $R$ times.
+6. Compute the $p$-value by
+\begin{align*}
+  \text{$p$-value}
+  = \frac{1}{R} \sum_{r=1}^{R} \mathbf{1}\{ T(\mathbf{z}^{(r)}, \mathbf{Y}_{\mathcal{S}}) \ge T(\mathbf{Z}, \mathbf{Y}_{\mathcal{S}}) \}.
+\end{align*}
+
+## Test Statistics
+
+In the **testinterference** package, we consider three test statistics.
+
+- Kruskal-Wallis (KW)
+- Average cross difference (ACD)
+- Ordinary least squares (OLS)
+
+To define these statistics, we add some notations.
+For a given treatment assignment $\mathbf{z}$, we partition the focal sub-population $\mathcal{S}$ into 3 groups:
+\begin{align*}
+	\mathcal{S}_1(\mathbf{z}) & = \left\{ i \in \mathcal{S}: \left( z_i, \max_{j \in \mathcal{P}_i} z_j \right) = (1, 0) \right\}, \\
+	\mathcal{S}_2(\mathbf{z}) & = \left\{ i \in \mathcal{S}: \left( z_i, \max_{j \in \mathcal{P}_i} z_j \right) = (0, 1) \right\}, \\
+	\mathcal{S}_3(\mathbf{z}) & = \left\{ i \in \mathcal{S}: \left( z_i, \max_{j \in \mathcal{P}_i} z_j \right) = (1, 1) \right\}.
+\end{align*}
+
+#### KW statistic
+
+We begin by ranking all $(Y_i)_{i \in \mathcal{S}}$ from 1 to $|\mathcal{S}|$.
+Let $v_i$ be the rank of $Y_i$ and $V_j(\mathbf{z})$ be the summation of the ranks for group $\mathcal{S}_j(\mathbf{z})$: $V_j(\mathbf{z}) = \sum_{i \in \mathcal{S}_j(\mathbf{z})} v_i$, where $j = 1, 2, 3$.
+The KW statistic compares the average rank for each group $j$, $V_j(\mathbf{z}) / |\mathcal{S}_j(\mathbf{z})|$, with the average rank for the entire $|\mathcal{S}|$, $(|\mathcal{S}| + 1) / 2$:
+\begin{align*}
+	T(\mathbf{z}, \mathbf{Y})
+	= \frac{12}{|\mathcal{S}| ( |\mathcal{S}| + 1 )} \sum_{j=1}^3 | \mathcal{S}_j(\mathbf{z}) | \left( \frac{ V_j(\mathbf{z}) }{ |\mathcal{S}_j(\mathbf{z})| } - \frac{|\mathcal{S}| + 1}{2} \right)^2.
+\end{align*} 
+
+#### ACD statistic
+
+The ACD statistic is defined simply as the average of the absolute average differences between the three groups:
+\begin{align*}
+	T(\mathbf{z}, \mathbf{Y})
+	= \frac{1}{3} \sum_{(j,k) \in \{ (1, 2), (1, 3), (2, 3) \}} \left| \frac{1}{|\mathcal{S}_j(\mathbf{z})|} \sum_{i \in \mathcal{S}_j(\mathbf{z})} Y_j - \frac{1}{|\mathcal{S}_k(\mathbf{z})|} \sum_{i \in \mathcal{S}_k(\mathbf{z})} Y_i \right|.
+\end{align*}
+
+#### OLS statistic
+
+The OLS statistic is defined as the $F$-statistic for the significance of $(\beta_1, \beta_2)$ in the OLS estimation of the following linear model:
+\begin{align*}
+	Y_i = \beta_0 + \beta_1 z_i + \beta_2 \left( \max_{j \in \mathcal{P}_i} z_j \right) + \text{error}_i
+	\qquad 
+	\text{for $i \in \mathcal{S}$},
+\end{align*}
+where $z_i$ denotes the $i$-th element of a given treatment assignment vector $\mathbf{z} = (z_1, \dots, z_n)$.
+
+## Simes' Correction
+
+Since we have multiple test statistics, it would be desirable to consider some correction for multiple testing.
+In the **testinterference** package, we implement Simes' correction.
+Specifically, letting $p^{(1)} \le \dots \le p^{(s)}$ denote the ordered $p$-values obtained from $s$ different test statistics, we reject the null hypothesis $\mathbb{H}_0$ under the significance level $\alpha$ if $p^{(j)} \le j \cdot \alpha / s$ for some $j = 1, \dots, s$.
+
+## References
+
+- Hoshino, T. and Yanagi, T., 2023. 
+Randomization test for the specification of interference structure
+arXiv preprint arXiv:2301.05580.
+[Link](https://doi.org/10.48550/arXiv.2301.05580)

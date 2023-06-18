@@ -1,0 +1,245 @@
+---
+title: "Getting Started with the testinterference Package"
+author: "Tadao Hoshino (thoshino@waseda.jp), Takahide Yanagi (yanagi@econ.kyoto-u.ac.jp)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with the testinterference Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7.5, 
+  fig.height = 5 
+)
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+## Introduction
+
+The **testinterference** package provides tools to test several hypotheses about spillover effects.
+Specifically, the package enables to perform randomization tests on whether or not the following null hypotheses are plausible:
+
+- **Fisher's sharp null hypothesis** (**Fisher**):
+One's outcome does not depend on one's own treatment.
+- **Stable Unit Treatment Value Assumption** (**SUTVA**): 
+One's outcome is determined by one's own treatment.
+- **Exposure 1**:
+One's outcome is determined by whether there is at least one treated unit in one's neighborhood including oneself.
+- **Exposure 2**:
+One's outcome is determined by one's own treatment and whether there is at least one treated peer.
+
+The testing procedures are developed by [Hoshino and Yanagi (2023) "Randomization test for the specification of interference structure"](https://doi.org/10.48550/arXiv.2301.05580).
+
+## Installation
+
+Get the package from GitHub:
+
+```{r, eval = F, echo = T}
+# install.packages("devtools") # if necessary
+devtools::install_github("tkhdyanagi/testinterference", build_vignettes = TRUE)
+```
+
+## Package Function
+
+The **testinterference** package provides the following function:
+
+- `testinterference()`: Randomization tests for the following null hypotheses: (1) Fisher, (2) SUTVA, (3) Exposure 1, (4) Exposure 2.
+
+#### Arguments
+
+The `testinterference()` function has the following arguments:
+
+- `Y`: The $n$-dimensional outcome vector
+- `Z`: The $n$-dimensional binary treatment assignment vector
+- `A`: The $n \times n$, binary, possibly asymmetric, adjacency matrix.
+   The diagonal elements must be zero.
+   This argument can be NULL if `hypothesis = Fisher`.
+   Default is NULL.
+- `hypothesis`: A character specifying the null hypothesis of interest.
+   Options are "Fisher", "SUTVA", "exposure1", and "exposure2".
+   "Fisher" stands for the sharp null hypothesis in the canonical Fisher randomization test.
+   "SUTVA", "exposure1", and "exposure2" correspond to 
+   the null hypotheses a, b, and c in Table 2 of Hoshino and Yanagi (2023).
+   Default is "SUTVA".
+   If `hypothesis = "exposure2"`, the user can specify the argument `kappa`.
+- `method`: A character specifying how to find focal units.
+   Options are "MIS", "random", and "manual", 
+   which stand for the method of maximum independent set (MIS), the random selection, and the manual selection.
+   Default is "MIS".
+   If `method = "random"`, the user can specify the argument `num_focal_unit`.
+   If `method = "manual"`, the user must specify the argument `focal_unit`.
+- `design`: A character specifying the randomization design of the original experiment.
+   Options are "Bernoulli", "complete", "stratified", and "other", 
+   which stand for Bernoulli randomization, complete randomization, stratified randomization, and other experimental designs.
+   If `design = "Bernoulli"`, the user must specify the argument `prob`.
+   If `design = "stratified"`,the user must specify the argument `strata`.
+   If `design = "other"`, the user must specify the argument `zmatrix`.
+- `prob`: NULL, a scalar indicating the homogeneous probability of being treatment eligible,
+   or an $n$-dimensional vector indicating the heterogeneous probabilities
+   for treatment eligibility (i.e., the $i$-th element of `prob` indicates $\Pr(Z_i = 1)$).
+   This argument is used only when `design = "Bernoulli"`.
+   Default is NULL.
+- `focal_unit`: NULL or an $n$-dimensional logical vector specifying whether each unit is focal.
+   This argument is used only when `method = "manual"`.
+   Default is NULL.
+- `num_focal_unit`: NULL or a positive scalar specifying the number of focal units.
+   This argument is used only when `method = "random"`.
+   Default is NULL.
+- `num_randomization`: A large positive integer specifying the number of randomization.
+   Default is 9999.
+   This argument is not used when `method = "other"`.
+- `strata`: NULL or an $n$-dimensional numerical vector indicating the stratum to which each unit belongs.
+   This argument is used only when `design = "stratified"`.
+   Default is NULL.
+- `zmatrix`: NULL or a large matrix of realizations of treatment assignments.
+   This argument must be specified by the user only when `design = "other"`.
+   The number of rows must equal to the sample size $n$.
+   The number of columns is the number of realizations given by the user.
+   Default is NULL.
+- `kappa`: NULL or a positive integer no less than 2.
+   This argument is used only when `hypothesis = "exposure2"`.
+   Default is NULL.
+   If `kappa = NULL`, kappa is automatically chosen to maximize the number of focal units.
+- `cores`: A positive integer specifying the number of cores to use for parallel computing.
+   Default is 1.
+
+#### Returns
+
+The `testinterference()` function returns a list containing the following elements:
+
+- `pval`: The vector of p-values obtained from Kruskal-Wallis (KW), average cross difference (ACD), and ordinary least squares (OLS) test statistics.
+- `Simes`: The vector of testing results by Simes' correction under significance levels 10%, 5%, and 1%.
+   TRUE (resp. FALSE) indicates the rejection (resp. acceptance) of the null hypothesis.
+- `stat`: A matrix of test statistics computed with focal assignments.
+- `focal_unit`: The logical vector indicating whether each unit is focal.
+- `focal_asgmt`: The matrix of focal assignments.
+- `num_focal_unit`: The number of focal units.
+- `num_focal_asgmt`: The number of focal assignments.
+
+## Example 1: A Single Large Network 
+
+We begin by generating artificial data using the `datageneration()` function.
+In the `datageneration()` function, there are two options to generate the adjacency matrix: 
+(1) Erdos-Renyi model and (2) pairs.
+In addition, there are three options for the experimental design: 
+(a) Bernoulli randomization, (b) complete randomization, and (c) stratified randomization.
+Here we consider the case (1)-(a) with:
+
+```{r, eval = T, echo = T}
+# Load the package
+library(testinterference)
+
+# Sample size
+n <- 200
+
+# Generate artificial data (Erdos-Renyi model)
+set.seed(1)
+data1 <- datageneration(n      = n,
+                        design = "Bernoulli",
+                        A      = "Erdos-Renyi",
+                        beta_s = 0)
+```
+
+Here, `beta_s` specifies the value of a coefficient for spillover effects in the outcome equation.
+`beta_s = 0` means that there are no spillovers.
+In other words, we consider the case where SUTVA holds.
+
+Run the `testinterference()` function:
+
+```{r, eval = T, echo = T}
+set.seed(1)
+RT1 <- testinterference(Y                 = data1$Y,
+                        Z                 = data1$Z,
+                        A                 = data1$A,
+                        hypothesis        = "SUTVA",
+                        method            = "MIS",
+                        design            = "Bernoulli",
+                        prob              = 0.5,
+                        focal_unit        = NULL,
+                        num_focal_unit    = NULL,
+                        num_randomization = 9999,
+                        strata            = NULL,
+                        zmatrix           = NULL,
+                        kappa             = NULL,
+                        cores             = 1)
+```
+
+The p-values obtained from Kruskal-Wallis (KW), average cross difference (ACD), and ordinary least squares (OLS) test statistics are:
+```{r, eval = T, echo = T}
+RT1$pval
+```
+
+The null hypothesis is not rejected at the standard significance level.
+In other words, we find no statistical evidence against SUTVA.
+
+The results of Simes' correction are:
+
+```{r, eval = T, echo = T}
+RT1$Simes
+```
+
+Here, `FALSE` indicates the acceptance of the null hypothesis.
+Again, the results suggest that SUTVA might hold.
+
+We can confirm the numbers of focal units and assignments with:
+
+```{r, eval = T, echo = T}
+RT1$num_focal_unit
+RT1$num_focal_asgmt
+```
+
+## Example 2: Pairs
+
+We turn to the case with pairwise interactions and complete randomization.
+To allow for the presence of spillovers, we specify a positive value of `beta_s`.
+
+```{r, eval = T, echo = T}
+# Generate artificial data (Erdos-Renyi model)
+set.seed(1)
+data2 <- datageneration(n      = n,
+                        design = "complete",
+                        A      = "pairs",
+                        beta_s    = 1)
+```
+
+Perform the randomization test:
+
+```{r, eval = T, echo = T}
+set.seed(1)
+RT2 <- testinterference(Y                 = data2$Y,
+                        Z                 = data2$Z,
+                        A                 = data2$A,
+                        hypothesis        = "SUTVA",
+                        method            = "MIS",
+                        design            = "complete",
+                        prob              = NULL,
+                        focal_unit        = NULL,
+                        num_focal_unit    = NULL,
+                        num_randomization = 9999,
+                        strata            = NULL,
+                        zmatrix           = NULL,
+                        kappa             = NULL,
+                        cores             = 1)
+```
+
+The results are:
+
+```{r, eval = T, echo = T}
+RT2$pval
+RT2$Simes
+```
+
+All p-values are sufficiently small.
+For the results of Simes' correction, `TRUE` indicates the rejection of the null hypothesis.
+Thus, the testing results suggest the violation of SUTVA.
+
+## References
+
+- Hoshino, T. and Yanagi, T., 2023. 
+Randomization test for the specification of interference structure
+arXiv preprint arXiv:2301.05580.
+[Link](https://doi.org/10.48550/arXiv.2301.05580)

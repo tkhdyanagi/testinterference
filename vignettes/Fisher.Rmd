@@ -1,0 +1,118 @@
+---
+title: "Testing Procedure: Fisher's Sharp Null Hypothesis"
+author: "Tadao Hoshino (thoshino@waseda.jp), Takahide Yanagi (yanagi@econ.kyoto-u.ac.jp)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Testing Procedure: Fisher's Sharp Null Hypothesis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7.5, 
+  fig.height = 5 
+)
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+## Introduction
+
+This vignette describes the testing procedure implemented in the `testinterference()` function when `hypothesis = "Fisher"`.
+
+## Setup
+
+Consider a finite population of $n$ units, $[n] = \{ 1, \dots, n \}$.
+
+Let $\mathbf{Z} = (Z_1, \dots, Z_n)$ denote the $n$-dimensional binary vector of realized treatment assignments.
+Suppose that $\mathbf{Z} \sim \mathbb{P}_{\mathbf{Z}}$ for a known assignment probability $\mathbb{P}_{\mathbf{Z}}$ (i.e., the experimental design).
+For instance, $\mathbb{P}_{\mathbf{Z}}$ may be Bernoulli randomization, complete randomization, stratified randomization, or other experimental designs.
+We write the set of all possible assignment patterns $\mathcal{Z} = \{ \mathbf{z} \in \{ 0, 1 \}^n: \mathbb{P}_{\mathbf{Z}}(\mathbf{z}) > 0 \}$.
+
+Let $\mathbf{Y} = (Y_1, \dots, Y_n)$, where $Y_i$ denotes the outcome variable for unit $i$.
+
+## Null Hypothesis
+
+Suppose that there is no interference so that the outcome for each unit does not depend on others' treatment assignments.
+Then, the potential outcome for unit $i$ given $Z_i = z$ for $z \in \{ 0, 1 \}$ is well defined, which we denote $Y_i(z)$.
+
+Fisher's sharp null hypothesis is
+\begin{align*}
+	\mathbb{H}_0: \quad 
+	Y_i(1) = Y_i(0)
+	\quad \text{for all $i \in [n]$}.
+\end{align*}
+This states that the outcome for each unit does not depend on unit's own treatment assignment.
+If we find statistical evidence against this hypothesis, it suggests the presence of some treatment effects.
+
+## Randomization Test
+
+The main idea behind testing the null hypothesis is to check whether the outcome distribution given $Z_i = 1$ is identical to that given $Z_i = 0$.
+Specifically, the testing procedure is as follows:
+
+1. Choose a test statistic $T(\mathbf{z}, \mathbf{y})$.
+2. Compute $T(\mathbf{Z}, \mathbf{Y})$ with the realized treatment assignment $\mathbf{Z}$ and the observed outcome $\mathbf{Y}$.
+3. Draw $\mathbf{z}^{(r)}$ independently from $\mathbb{P}_{\mathbf{Z}}$.
+4. Compute $T(\mathbf{z}^{(r)}, \mathbf{Y})$ under $\mathbb{H}_0$.
+5. Repeat the above two steps $R$ times.
+6. Compute the $p$-value by
+\begin{align*}
+  \text{$p$-value}
+  = \frac{1}{R} \sum_{r=1}^{R} \mathbf{1}\{ T(\mathbf{z}^{(r)}, \mathbf{Y}) \ge T(\mathbf{Z}, \mathbf{Y}) \}.
+\end{align*}
+  
+## Test Statistics
+
+In the **testinterference** package, we consider three test statistics.
+
+- Kruskal-Wallis (KW)
+- Average cross difference (ACD)
+- Ordinary least squares (OLS)
+
+To define these statistics, we add some notations.
+For a given treatment assignment $\mathbf{z}$, we partition the sample into 2 groups:
+\begin{align*}
+	\mathcal{S}_1(\mathbf{z}) & = \{ i \in [n]: Z_i = 0 \}, \\
+	\mathcal{S}_2(\mathbf{z}) & = \{ i \in [n]: Z_i = 1 \}.
+\end{align*}
+
+#### KW statistic
+
+We begin by ranking all $(Y_1, \dots, Y_n)$ from 1 to $n$.
+Let $v_i$ be the rank of $Y_i$ and $V_j(\mathbf{z})$ be the summation of the ranks for group $\mathcal{S}_j(\mathbf{z})$: $V_j(\mathbf{z}) = \sum_{i \in \mathcal{S}_j(\mathbf{z})} v_i$, where $j = 1, 2$.
+The KW statistic compares the average rank for each group $j$, $V_j(\mathbf{z}) / |\mathcal{S}_j(\mathbf{z})|$, with the average rank for the whole sample, $(n + 1) / 2$:
+\begin{align*}
+	T(\mathbf{z}, \mathbf{Y})
+	= \frac{12}{n (n + 1)} \sum_{j=1}^2 | \mathcal{S}_j(\mathbf{z}) | \left( \frac{ V_j(\mathbf{z}) }{ |\mathcal{S}_j(\mathbf{z})| } - \frac{n + 1}{2} \right)^2.
+\end{align*} 
+
+#### ACD statistic
+
+The ACD statistic is defined simply as the absolute average difference between the two groups:
+\begin{align*}
+	T(\mathbf{z}, \mathbf{Y})
+	= \left| \frac{1}{|\mathcal{S}_1(\mathbf{z})|} \sum_{i \in \mathcal{S}_1(\mathbf{z})} Y_i - \frac{1}{|\mathcal{S}_2(\mathbf{z})|} \sum_{i \in \mathcal{S}_2(\mathbf{z})} Y_i \right|.
+\end{align*}
+
+#### OLS statistic
+
+The OLS statistic is defined as the $F$-statistic for the significance of $\beta_2$ in the OLS estimation of the following linear model:
+\begin{align*}
+	Y_i = \beta_1 + \beta_2 z_i + \text{error}_i,
+\end{align*}
+where $z_i$ denotes the $i$-th element of a given treatment assignment vector $\mathbf{z} = (z_1, \dots, z_n)$.
+
+## Simes' Correction
+
+Since we have multiple test statistics, it would be desirable to consider some correction for multiple testing.
+In the **testinterference** package, we implement Simes' correction.
+Specifically, letting $p^{(1)} \le \dots \le p^{(s)}$ denote the ordered $p$-values obtained from $s$ different test statistics, we reject the null hypothesis $\mathbb{H}_0$ under the significance level $\alpha$ if $p^{(j)} \le j \cdot \alpha / s$ for some $j = 1, \dots, s$.
+
+## References
+
+- Hoshino, T. and Yanagi, T., 2023. 
+Randomization test for the specification of interference structure
+arXiv preprint arXiv:2301.05580.
+[Link](https://doi.org/10.48550/arXiv.2301.05580)
