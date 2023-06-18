@@ -1,0 +1,14 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  Fisher: Fisher.html
+  SUTVA: SUTVA.html
+  exposure1: exposure1.html
+  exposure2: exposure2.html
+  testinterference: testinterference.html
+last_built: 2023-06-18T07:08Z
+urls:
+  reference: https://tkhdyanagi.github.io/testinterference/reference
+  article: https://tkhdyanagi.github.io/testinterference/articles
+
