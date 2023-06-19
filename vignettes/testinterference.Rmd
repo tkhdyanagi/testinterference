@@ -20,13 +20,13 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 
 ## Introduction
 
-The **testinterference** package provides tools to test several hypotheses about spillover effects.
+The **testinterference** package provides tools to test SUTVA and several hypotheses about spillover effects.
 Specifically, the package enables to perform randomization tests on whether or not the following null hypotheses are plausible:
 
-- **Fisher's sharp null hypothesis** (**Fisher**):
-One's outcome does not depend on one's own treatment.
-- **Stable Unit Treatment Value Assumption** (**SUTVA**): 
-One's outcome is determined by one's own treatment.
+- **Fisher**:
+One's outcome does not depend on one's own treatment (i.e., Fisher's sharp null hypothesis).
+- **SUTVA**:
+One's outcome is determined by one's own treatment (i.e., the stable unit treatment value assumption).
 - **Exposure 1**:
 One's outcome is determined by whether there is at least one treated unit in one's neighborhood including oneself.
 - **Exposure 2**:
@@ -141,14 +141,14 @@ set.seed(1)
 data1 <- datageneration(n      = n,
                         design = "Bernoulli",
                         A      = "Erdos-Renyi",
-                        beta_s = 0)
+                        beta_s = 1)
 ```
 
 Here, `beta_s` specifies the value of a coefficient for spillover effects in the outcome equation.
 `beta_s = 0` means that there are no spillovers.
-In other words, we consider the case where SUTVA holds.
+In this example, we consider the case where SUTVA does not hold.
 
-Run the `testinterference()` function:
+Run the `testinterference()` function to test SUTVA:
 
 ```{r, eval = T, echo = T}
 set.seed(1)
@@ -161,20 +161,23 @@ RT1 <- testinterference(Y                 = data1$Y,
                         prob              = 0.5,
                         focal_unit        = NULL,
                         num_focal_unit    = NULL,
-                        num_randomization = 9999,
+                        num_randomization = 999,
                         strata            = NULL,
                         zmatrix           = NULL,
                         kappa             = NULL,
                         cores             = 1)
 ```
 
+Here, we set `num_randomization = 999` to reduce the computation time, 
+but in realistic situations the number of randomization should be larger (e.g., `num_randomization = 99999`).
+
 The p-values obtained from Kruskal-Wallis (KW), average cross difference (ACD), and ordinary least squares (OLS) test statistics are:
 ```{r, eval = T, echo = T}
 RT1$pval
 ```
 
-The null hypothesis is not rejected at the standard significance level.
-In other words, we find no statistical evidence against SUTVA.
+The null hypothesis is rejected at the standard significance level.
+In other words, we find statistical evidence that SUTVA is implausible.
 
 The results of Simes' correction are:
 
@@ -182,8 +185,8 @@ The results of Simes' correction are:
 RT1$Simes
 ```
 
-Here, `FALSE` indicates the acceptance of the null hypothesis.
-Again, the results suggest that SUTVA might hold.
+Here, `TRUE` indicates the rejection of the null hypothesis.
+Again, the results suggest that SUTVA does not hold.
 
 We can confirm the numbers of focal units and assignments with:
 
@@ -192,10 +195,40 @@ RT1$num_focal_unit
 RT1$num_focal_asgmt
 ```
 
+Next, we turn to test whether exposure 2 is correct.
+
+```{r, eval = T, echo = T}
+set.seed(1)
+RT2 <- testinterference(Y                 = data1$Y,
+                        Z                 = data1$Z,
+                        A                 = data1$A,
+                        hypothesis        = "exposure2",
+                        method            = "MIS",
+                        design            = "Bernoulli",
+                        prob              = 0.5,
+                        focal_unit        = NULL,
+                        num_focal_unit    = NULL,
+                        num_randomization = 999,
+                        strata            = NULL,
+                        zmatrix           = NULL,
+                        kappa             = NULL,
+                        cores             = 1)
+```
+
+The testing results are:
+```{r, eval = T, echo = T}
+RT2$pval
+RT2$Simes
+RT2$num_focal_unit
+RT2$num_focal_asgmt
+```
+
+We find statistical evidence that exposure 2 is incorrect.
+
 ## Example 2: Pairs
 
-We turn to the case with pairwise interactions and complete randomization.
-To allow for the presence of spillovers, we specify a positive value of `beta_s`.
+We turn to the case with possible pairwise interactions and complete randomization.
+To consider the case without interference, we specify `beta_s = 0`.
 
 ```{r, eval = T, echo = T}
 # Generate artificial data (Erdos-Renyi model)
@@ -203,14 +236,14 @@ set.seed(1)
 data2 <- datageneration(n      = n,
                         design = "complete",
                         A      = "pairs",
-                        beta_s    = 1)
+                        beta_s = 0)
 ```
 
 Perform the randomization test:
 
 ```{r, eval = T, echo = T}
 set.seed(1)
-RT2 <- testinterference(Y                 = data2$Y,
+RT3 <- testinterference(Y                 = data2$Y,
                         Z                 = data2$Z,
                         A                 = data2$A,
                         hypothesis        = "SUTVA",
@@ -219,23 +252,30 @@ RT2 <- testinterference(Y                 = data2$Y,
                         prob              = NULL,
                         focal_unit        = NULL,
                         num_focal_unit    = NULL,
-                        num_randomization = 9999,
+                        num_randomization = 999,
                         strata            = NULL,
                         zmatrix           = NULL,
                         kappa             = NULL,
                         cores             = 1)
 ```
 
-The results are:
+The testing results are:
 
 ```{r, eval = T, echo = T}
-RT2$pval
-RT2$Simes
+RT3$pval
+RT3$Simes
+RT3$num_focal_unit
+RT3$num_focal_asgmt
 ```
 
-All p-values are sufficiently small.
-For the results of Simes' correction, `TRUE` indicates the rejection of the null hypothesis.
-Thus, the testing results suggest the violation of SUTVA.
+The null hypothesis is not rejected at the standard significance level.
+For the results of Simes' correction, `FALSE` indicates the acceptance of the null hypothesis.
+Thus, the testing results suggest that SUTVA might hold.
+
+In the case with pairwise interactions, 
+it is impossible to perform randomization tests for `hypothesis = "exposure2"`.
+This is because each unit has only one peer so that $\mathcal{N}(\kappa)$ is empty for any $\kappa \ge 2$.
+See the vignette `vignette("exposure2", package = "testinterference")` for more details.
 
 ## References
 

@@ -301,44 +301,42 @@ find_focal_asgmt <- function(Z,
     # Set focal assignments for focal units
     focal_asgmt[focal_unit, ] <- Z[focal_unit]
 
-    # List of treatment eligible peers of each focal unit ----------------------
-
+    # List of treatment eligible peers of each focal unit
     list_Z1 <- foreach::foreach(id_unit = id_focal_unit, .combine = "append", .inorder = TRUE) %dopar% {
 
       list(which(A[id_unit, ] == 1 & Z == 1))
 
     }
 
+    # Random selection of treatment eligible units fixed at Z = 1
+    id_fix_Z1 <- foreach::foreach(i = 1:num_focal_unit, .combine = "c", .inorder = TRUE) %dopar% {
+
+      if (length(list_Z1[[i]]) == 1) {
+
+        list_Z1[[i]]
+
+      } else {
+
+        sample(list_Z1[[i]], size = 1)
+
+      }
+    }
+
+    # n-dimensional logical vector for treatment eligible units fixed at Z = 1
+    fix_Z1 <- 1:n %in% id_fix_Z1
+
+    # Set focal assignments for treatment eligible units fixed at Z = 1
+    focal_asgmt[fix_Z1, ] <- 1
+
+    # Units subject to randomization
+    rand_unit <- (!focal_unit) & (!fix_Z1)
+
+    # Number of units subject to randomization
+    num_rand_unit <- sum(rand_unit)
+
     # Randomization ------------------------------------------------------------
 
     for (id_rand in 2:num_focal_asgmt) {
-
-      # Random selection of treatment eligible units fixed at Z = 1 ------------
-
-      id_fix_Z1 <- foreach::foreach(i = 1:num_focal_unit, .combine = "c", .inorder = TRUE) %dopar% {
-
-        if (length(list_Z1[[i]]) == 1) {
-
-          list_Z1[[i]]
-
-        } else {
-
-          sample(list_Z1[[i]], size = 1)
-
-        }
-      }
-
-      # n-dimensional logical vector for treatment eligible units fixed at Z = 1
-      fix_Z1 <- 1:n %in% id_fix_Z1
-
-      # Set focal assignments for treatment eligible units fixed at Z = 1
-      focal_asgmt[fix_Z1, id_rand] <- 1
-
-      # Units subject to randomization
-      rand_unit <- (!focal_unit) & (!fix_Z1)
-
-      # Number of units subject to randomization
-      num_rand_unit <- sum(rand_unit)
 
       # Bernoulli randomization ------------------------------------------------
 

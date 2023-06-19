@@ -114,7 +114,7 @@
 #'                          hypothesis = "SUTVA",
 #'                          method = "MIS",
 #'                          design = "complete",
-#'                          num_randomization = 9999,
+#'                          num_randomization = 999,
 #'                          cores = 1)
 #'
 #' @references Hoshino, T., & Yanagi, T. (2023).
