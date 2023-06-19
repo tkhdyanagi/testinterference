@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">testinterference</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,18 +85,16 @@
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>The <strong>testinterference</strong> package provides tools to test
-several hypotheses about spillover effects. Specifically, the package
-enables to perform randomization tests on whether or not the following
-null hypotheses are plausible:</p>
+SUTVA and several hypotheses about spillover effects. Specifically, the
+package enables to perform randomization tests on whether or not the
+following null hypotheses are plausible:</p>
 <ul>
 <li>
-<strong>Fisher’s sharp null hypothesis</strong>
-(<strong>Fisher</strong>): One’s outcome does not depend on one’s own
-treatment.</li>
+<strong>Fisher</strong>: One’s outcome does not depend on one’s own
+treatment (i.e., Fisher’s sharp null hypothesis).</li>
 <li>
-<strong>Stable Unit Treatment Value Assumption</strong>
-(<strong>SUTVA</strong>): One’s outcome is determined by one’s own
-treatment.</li>
+<strong>SUTVA</strong>: One’s outcome is determined by one’s own
+treatment (i.e., the stable unit treatment value assumption).</li>
 <li>
 <strong>Exposure 1</strong>: One’s outcome is determined by whether
 there is at least one treated unit in one’s neighborhood including
@@ -262,12 +260,12 @@ randomization. Here we consider the case (1)-(a) with:</p>
 <span><span class="va">data1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/datageneration.html">datageneration</a></span><span class="op">(</span>n      <span class="op">=</span> <span class="va">n</span>,</span>
 <span>                        design <span class="op">=</span> <span class="st">"Bernoulli"</span>,</span>
 <span>                        A      <span class="op">=</span> <span class="st">"Erdos-Renyi"</span>,</span>
-<span>                        beta_s <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<span>                        beta_s <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p>Here, <code>beta_s</code> specifies the value of a coefficient for
 spillover effects in the outcome equation. <code>beta_s = 0</code> means
-that there are no spillovers. In other words, we consider the case where
-SUTVA holds.</p>
-<p>Run the <code><a href="../reference/testinterference.html">testinterference()</a></code> function:</p>
+that there are no spillovers. In this example, we consider the case
+where SUTVA does not hold.</p>
+<p>Run the <code><a href="../reference/testinterference.html">testinterference()</a></code> function to test SUTVA:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">RT1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/testinterference.html">testinterference</a></span><span class="op">(</span>Y                 <span class="op">=</span> <span class="va">data1</span><span class="op">$</span><span class="va">Y</span>,</span>
@@ -279,52 +277,86 @@ SUTVA holds.</p>
 <span>                        prob              <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>                        focal_unit        <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        num_focal_unit    <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>                        num_randomization <span class="op">=</span> <span class="fl">9999</span>,</span>
+<span>                        num_randomization <span class="op">=</span> <span class="fl">999</span>,</span>
 <span>                        strata            <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        zmatrix           <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        kappa             <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        cores             <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p>Here, we set <code>num_randomization = 999</code> to reduce the
+computation time, but in realistic situations the number of
+randomization should be larger (e.g.,
+<code>num_randomization = 99999</code>).</p>
 <p>The p-values obtained from Kruskal-Wallis (KW), average cross
 difference (ACD), and ordinary least squares (OLS) test statistics
 are:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RT1</span><span class="op">$</span><span class="va">pval</span></span>
-<span><span class="co">#&gt;     KW    ACD    OLS </span></span>
-<span><span class="co">#&gt; 0.9774 0.9040 0.9097</span></span></code></pre></div>
-<p>The null hypothesis is not rejected at the standard significance
-level. In other words, we find no statistical evidence against
-SUTVA.</p>
+<span><span class="co">#&gt;    KW   ACD   OLS </span></span>
+<span><span class="co">#&gt; 0.002 0.003 0.001</span></span></code></pre></div>
+<p>The null hypothesis is rejected at the standard significance level.
+In other words, we find statistical evidence that SUTVA is
+implausible.</p>
 <p>The results of Simes’ correction are:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RT1</span><span class="op">$</span><span class="va">Simes</span></span>
-<span><span class="co">#&gt;   10%    5%    1% </span></span>
-<span><span class="co">#&gt; FALSE FALSE FALSE</span></span></code></pre></div>
-<p>Here, <code>FALSE</code> indicates the acceptance of the null
-hypothesis. Again, the results suggest that SUTVA might hold.</p>
+<span><span class="co">#&gt;  10%   5%   1% </span></span>
+<span><span class="co">#&gt; TRUE TRUE TRUE</span></span></code></pre></div>
+<p>Here, <code>TRUE</code> indicates the rejection of the null
+hypothesis. Again, the results suggest that SUTVA does not hold.</p>
 <p>We can confirm the numbers of focal units and assignments with:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RT1</span><span class="op">$</span><span class="va">num_focal_unit</span></span>
 <span><span class="co">#&gt; [1] 84</span></span>
 <span><span class="va">RT1</span><span class="op">$</span><span class="va">num_focal_asgmt</span></span>
-<span><span class="co">#&gt; [1] 10000</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 1000</span></span></code></pre></div>
+<p>Next, we turn to test whether exposure 2 is correct.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">RT2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/testinterference.html">testinterference</a></span><span class="op">(</span>Y                 <span class="op">=</span> <span class="va">data1</span><span class="op">$</span><span class="va">Y</span>,</span>
+<span>                        Z                 <span class="op">=</span> <span class="va">data1</span><span class="op">$</span><span class="va">Z</span>,</span>
+<span>                        A                 <span class="op">=</span> <span class="va">data1</span><span class="op">$</span><span class="va">A</span>,</span>
+<span>                        hypothesis        <span class="op">=</span> <span class="st">"exposure2"</span>,</span>
+<span>                        method            <span class="op">=</span> <span class="st">"MIS"</span>,</span>
+<span>                        design            <span class="op">=</span> <span class="st">"Bernoulli"</span>,</span>
+<span>                        prob              <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>                        focal_unit        <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                        num_focal_unit    <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                        num_randomization <span class="op">=</span> <span class="fl">999</span>,</span>
+<span>                        strata            <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                        zmatrix           <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                        kappa             <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                        cores             <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p>The testing results are:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">RT2</span><span class="op">$</span><span class="va">pval</span></span>
+<span><span class="co">#&gt;    KW   ACD   OLS </span></span>
+<span><span class="co">#&gt; 0.003 0.001 0.012</span></span>
+<span><span class="va">RT2</span><span class="op">$</span><span class="va">Simes</span></span>
+<span><span class="co">#&gt;  10%   5%   1% </span></span>
+<span><span class="co">#&gt; TRUE TRUE TRUE</span></span>
+<span><span class="va">RT2</span><span class="op">$</span><span class="va">num_focal_unit</span></span>
+<span><span class="co">#&gt; [1] 34</span></span>
+<span><span class="va">RT2</span><span class="op">$</span><span class="va">num_focal_asgmt</span></span>
+<span><span class="co">#&gt; [1] 1000</span></span></code></pre></div>
+<p>We find statistical evidence that exposure 2 is incorrect.</p>
 </div>
 <div class="section level2">
 <h2 id="example-2-pairs">Example 2: Pairs<a class="anchor" aria-label="anchor" href="#example-2-pairs"></a>
 </h2>
-<p>We turn to the case with pairwise interactions and complete
-randomization. To allow for the presence of spillovers, we specify a
-positive value of <code>beta_s</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>We turn to the case with possible pairwise interactions and complete
+randomization. To consider the case without interference, we specify
+<code>beta_s = 0</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generate artificial data (Erdos-Renyi model)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">data2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/datageneration.html">datageneration</a></span><span class="op">(</span>n      <span class="op">=</span> <span class="va">n</span>,</span>
 <span>                        design <span class="op">=</span> <span class="st">"complete"</span>,</span>
 <span>                        A      <span class="op">=</span> <span class="st">"pairs"</span>,</span>
-<span>                        beta_s    <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span>                        beta_s <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p>Perform the randomization test:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">RT2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/testinterference.html">testinterference</a></span><span class="op">(</span>Y                 <span class="op">=</span> <span class="va">data2</span><span class="op">$</span><span class="va">Y</span>,</span>
+<span><span class="va">RT3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/testinterference.html">testinterference</a></span><span class="op">(</span>Y                 <span class="op">=</span> <span class="va">data2</span><span class="op">$</span><span class="va">Y</span>,</span>
 <span>                        Z                 <span class="op">=</span> <span class="va">data2</span><span class="op">$</span><span class="va">Z</span>,</span>
 <span>                        A                 <span class="op">=</span> <span class="va">data2</span><span class="op">$</span><span class="va">A</span>,</span>
 <span>                        hypothesis        <span class="op">=</span> <span class="st">"SUTVA"</span>,</span>
@@ -333,23 +365,33 @@ positive value of <code>beta_s</code>.</p>
 <span>                        prob              <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        focal_unit        <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        num_focal_unit    <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>                        num_randomization <span class="op">=</span> <span class="fl">9999</span>,</span>
+<span>                        num_randomization <span class="op">=</span> <span class="fl">999</span>,</span>
 <span>                        strata            <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        zmatrix           <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        kappa             <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        cores             <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>The results are:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">RT2</span><span class="op">$</span><span class="va">pval</span></span>
+<p>The testing results are:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">RT3</span><span class="op">$</span><span class="va">pval</span></span>
 <span><span class="co">#&gt;    KW   ACD   OLS </span></span>
-<span><span class="co">#&gt; 1e-04 1e-04 1e-04</span></span>
-<span><span class="va">RT2</span><span class="op">$</span><span class="va">Simes</span></span>
-<span><span class="co">#&gt;  10%   5%   1% </span></span>
-<span><span class="co">#&gt; TRUE TRUE TRUE</span></span></code></pre></div>
-<p>All p-values are sufficiently small. For the results of Simes’
-correction, <code>TRUE</code> indicates the rejection of the null
-hypothesis. Thus, the testing results suggest the violation of
-SUTVA.</p>
+<span><span class="co">#&gt; 0.226 0.265 0.513</span></span>
+<span><span class="va">RT3</span><span class="op">$</span><span class="va">Simes</span></span>
+<span><span class="co">#&gt;   10%    5%    1% </span></span>
+<span><span class="co">#&gt; FALSE FALSE FALSE</span></span>
+<span><span class="va">RT3</span><span class="op">$</span><span class="va">num_focal_unit</span></span>
+<span><span class="co">#&gt; [1] 100</span></span>
+<span><span class="va">RT3</span><span class="op">$</span><span class="va">num_focal_asgmt</span></span>
+<span><span class="co">#&gt; [1] 1000</span></span></code></pre></div>
+<p>The null hypothesis is not rejected at the standard significance
+level. For the results of Simes’ correction, <code>FALSE</code>
+indicates the acceptance of the null hypothesis. Thus, the testing
+results suggest that SUTVA might hold.</p>
+<p>In the case with pairwise interactions, it is impossible to perform
+randomization tests for <code>hypothesis = "exposure2"</code>. This is
+because each unit has only one peer so that <span class="math inline">\(\mathcal{N}(\kappa)\)</span> is empty for any
+<span class="math inline">\(\kappa \ge 2\)</span>. See the vignette
+<code><a href="../articles/exposure2.html">vignette("exposure2", package = "testinterference")</a></code> for
+more details.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
