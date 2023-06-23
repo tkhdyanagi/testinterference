@@ -1,4 +1,4 @@
-#' Generate Artificial Data from Simulation
+#' Generate Artificial Data by Simulation
 #'
 #' @param n An even number specifying the sample size
 #' @param design

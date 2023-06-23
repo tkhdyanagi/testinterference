@@ -2,7 +2,7 @@
 % Please edit documentation in R/datageneration.R
 \name{datageneration}
 \alias{datageneration}
-\title{Generate Artificial Data from Simulation}
+\title{Generate Artificial Data by Simulation}
 \usage{
 datageneration(
   n,
@@ -49,7 +49,7 @@ A list containing the following elements.
 \item{strata}{An n-dimensional vector indicating strata}
 }
 \description{
-Generate Artificial Data from Simulation
+Generate Artificial Data by Simulation
 }
 \examples{
 data <- datageneration(n = 200)

@@ -74,25 +74,25 @@ find_focal_asgmt <- function(Z,
     if (design == "Bernoulli") {
 
       # Find focal assignments
-      focal_asgmt[, -1] <- foreach::foreach(id_rand = 2:num_focal_asgmt, .combine = "cbind", .inorder = TRUE) %dopar% {
+      if (length(prob) == 1) {
 
-        if (length(prob) == 1) {
+        focal_asgmt[, -1] <- matrix(data = sample(x = 0:1,
+                                                  prob = c(1 - prob, prob),
+                                                  size = n * num_randomization,
+                                                  replace = TRUE),
+                                    nrow = n,
+                                    ncol = num_randomization,
+                                    byrow = TRUE)
 
-          sample(x = 0:1,
-                 prob = c(1 - prob, prob),
-                 size = n,
-                 replace = TRUE)
+      } else if (length(prob) == n) {
 
-        } else {
+        focal_asgmt[, -1] <- t(apply(X = cbind(1 - prob, prob),
+                                     FUN = sample,
+                                     MARGIN = 1,
+                                     x = 0:1,
+                                     size = num_randomization,
+                                     replace = TRUE))
 
-          apply(X = cbind(1 - prob, prob),
-                FUN = sample,
-                MARGIN = 1,
-                x = 0:1,
-                size = 1,
-                replace = FALSE)
-
-        }
       }
     }
 
@@ -107,17 +107,24 @@ find_focal_asgmt <- function(Z,
         # Number of units in this stratum
         num_st_unit <- sum(st_unit)
 
-        if (num_st_unit > 0) {
+        if (num_st_unit == 1) {
+
+          # Set focal assignments for this unit
+          focal_asgmt[st_unit, -1] <- Z[st_unit]
+
+        } else if (num_st_unit > 1) {
 
           # Support of randomization in this stratum
           supp_Z_st <- Z[st_unit]
 
-          # Find focal assignments
-          focal_asgmt[st_unit, -1] <- foreach::foreach(id_rand = 2:num_focal_asgmt, .combine = "cbind", .inorder = TRUE) %dopar% {
+          # Randomization in this stratum
+          focal_asgmt[st_unit, -1] <-
+            matrix(data = rep(supp_Z_st, num_randomization),
+                   nrow = num_st_unit,
+                   ncol = num_randomization,
+                   byrow = FALSE) %>%
+            apply(FUN = sample, MARGIN = 2)
 
-            sample(supp_Z_st)
-
-          }
         }
       }
     }
@@ -141,25 +148,27 @@ find_focal_asgmt <- function(Z,
     if (design == "Bernoulli") {
 
       # Find focal assignments for units subject to randomization
-      focal_asgmt[rand_unit, -1] <- foreach::foreach(id_rand  = 2:num_focal_asgmt, .combine = "cbind", .inorder = TRUE) %dopar% {
+      if (length(prob) == 1) {
 
-        if (length(prob) == 1) {
+        focal_asgmt[rand_unit, -1] <-
+          matrix(data = sample(x = 0:1,
+                               prob = c(1 - prob, prob),
+                               size = num_rand_unit * num_randomization,
+                               replace = TRUE),
+                 nrow = num_rand_unit,
+                 ncol = num_randomization,
+                 byrow = TRUE)
 
-          sample(x = 0:1,
-                 prob = c(1 - prob, prob),
-                 size = num_rand_unit,
-                 replace = TRUE)
+      } else if (length(prob) == n) {
 
-        } else {
+        focal_asgmt[rand_unit, -1] <-
+          t(apply(X = cbind(1 - prob[rand_unit], prob[rand_unit]),
+                  FUN = sample,
+                  MARGIN = 1,
+                  x = 0:1,
+                  size = num_randomization,
+                  replace = TRUE))
 
-          apply(X = cbind(1 - prob[rand_unit], prob[rand_unit]),
-                FUN = sample,
-                MARGIN = 1,
-                x = 0:1,
-                size = 1,
-                replace = FALSE)
-
-        }
       }
     }
 
@@ -176,17 +185,24 @@ find_focal_asgmt <- function(Z,
         # Number of units subject to randomization in this stratum
         num_st_rand_unit <- sum(st_rand_unit)
 
-        if (num_st_rand_unit > 0) {
+        if (num_st_rand_unit == 1) {
+
+          # Set focal assignments for this unit
+          focal_asgmt[st_rand_unit, -1] <- Z[st_rand_unit]
+
+        } else if (num_st_rand_unit > 1) {
 
           # Support of randomization in this stratum
           supp_Z_st_rand <- Z[st_rand_unit]
 
           # Find focal assignments for units subject to randomization
-          focal_asgmt[st_rand_unit, -1] <- foreach::foreach(id_rand = 2:num_focal_asgmt, .combine = "cbind", .inorder = TRUE) %dopar% {
+          focal_asgmt[st_rand_unit, -1] <-
+            matrix(data = rep(supp_Z_st_rand, num_randomization),
+                   nrow = num_st_rand_unit,
+                   ncol = num_randomization,
+                   byrow = FALSE) %>%
+            apply(FUN = sample, MARGIN = 2)
 
-            sample(supp_Z_st_rand)
-
-          }
         }
       }
     }
@@ -254,7 +270,7 @@ find_focal_asgmt <- function(Z,
                    size = num_rand_unit,
                    replace = TRUE)
 
-        } else {
+        } else if (length(prob) == n) {
 
           focal_asgmt[rand_unit, id_rand] <-
             apply(X = cbind(1 - prob[rand_unit], prob[rand_unit]),
@@ -334,57 +350,66 @@ find_focal_asgmt <- function(Z,
     # Number of units subject to randomization
     num_rand_unit <- sum(rand_unit)
 
-    # Randomization ------------------------------------------------------------
+    # Bernoulli randomization --------------------------------------------------
 
-    for (id_rand in 2:num_focal_asgmt) {
+    if (design == "Bernoulli") {
 
-      # Bernoulli randomization ------------------------------------------------
+      # Find focal assignments for units subject to randomization
+      if (length(prob) == 1) {
 
-      if (design == "Bernoulli") {
+        focal_asgmt[rand_unit, -1] <-
+          matrix(data = sample(x = 0:1,
+                               prob = c(1 - prob, prob),
+                               size = num_rand_unit * num_randomization,
+                               replace = TRUE),
+                 nrow = num_rand_unit,
+                 ncol = num_randomization,
+                 byrow = TRUE)
 
-        # Find focal assignments for units subject to randomization
-        if (length(prob) == 1) {
+      } else if (length(prob) == n){
 
-          focal_asgmt[rand_unit, id_rand] <-
-            sample(x = 0:1,
-                   prob = c(1 - prob, prob),
-                   size = num_rand_unit,
-                   replace = TRUE)
-
-        } else {
-
-          focal_asgmt[rand_unit, id_rand] <-
-            apply(X = cbind(1 - prob[rand_unit], prob[rand_unit]),
+        focal_asgmt[rand_unit, -1] <-
+          t(apply(X = cbind(1 - prob[rand_unit], prob[rand_unit]),
                   FUN = sample,
                   MARGIN = 1,
                   x = 0:1,
-                  size = 1,
-                  replace = FALSE)
-        }
+                  size = num_randomization,
+                  replace = TRUE))
+
       }
+    }
 
-      # Complete / stratified randomization ------------------------------------
+    # Complete / stratified randomization --------------------------------------
 
-      if (design == "complete" | design == "stratified") {
+    if (design == "complete" | design == "stratified") {
 
-        # Randomization within each stratum ("st" stands for stratum)
-        for (st in supp_strata) {
+      # Randomization within each stratum ("st" stands for stratum)
+      for (st in supp_strata) {
 
-          # Units subject to randomization in this stratum
-          st_rand_unit <- (rand_unit) & (strata == st)
+        # Units subject to randomization in this stratum
+        st_rand_unit <- (rand_unit) & (strata == st)
 
-          # Number of units subject to randomization in this stratum
-          num_st_rand_unit <- sum(st_rand_unit)
+        # Number of units subject to randomization in this stratum
+        num_st_rand_unit <- sum(st_rand_unit)
 
-          if (num_st_rand_unit > 0) {
+        if (num_st_rand_unit == 1) {
 
-            # Support of randomization in this stratum
-            supp_Z_st_rand <- Z[st_rand_unit]
+          # Set focal assignments for this unit
+          focal_asgmt[st_rand_unit, -1] <- Z[st_rand_unit]
 
-            # Find focal assignments for units subject to randomization
-            focal_asgmt[st_rand_unit, id_rand] <- sample(supp_Z_st_rand)
+        } else if (num_st_rand_unit > 1) {
 
-          }
+          # Support of randomization in this stratum
+          supp_Z_st_rand <- Z[st_rand_unit]
+
+          # Find focal assignments for units subject to randomization
+          focal_asgmt[st_rand_unit, -1] <-
+            matrix(data = rep(supp_Z_st_rand, num_randomization),
+                   nrow = num_st_rand_unit,
+                   ncol = num_randomization,
+                   byrow = FALSE) %>%
+            apply(FUN = sample, MARGIN = 2)
+
         }
       }
     }
