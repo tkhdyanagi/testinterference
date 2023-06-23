@@ -1,3 +1,7 @@
+# testinterference 0.1.4
+
+* Minor updates (find_focal_asgmt.R).
+
 # testinterference 0.1.3
 
 * Improved computation time (find_focal_asgmt.R).

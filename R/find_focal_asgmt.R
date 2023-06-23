@@ -232,15 +232,15 @@ find_focal_asgmt <- function(Z,
     for (id_rand in 2:num_focal_asgmt) {
 
       # Random selection of treatment eligible units fixed at Z = 1
-      id_fix_Z1 <- foreach::foreach(i = 1:num_focal_unit, .combine = "c", .inorder = TRUE) %dopar% {
-
+      id_fix_Z1 <- NULL
+      for (i in 1:num_focal_unit) {
         if (length(list_Z1[[i]]) == 1) {
 
-          list_Z1[[i]]
+          id_fix_Z1 <- c(id_fix_Z1, list_Z1[[i]])
 
         } else {
 
-          sample(x = list_Z1[[i]], size = 1)
+          id_fix_Z1 <- c(id_fix_Z1, sample(x = list_Z1[[i]], size = 1))
 
         }
       }
@@ -325,15 +325,15 @@ find_focal_asgmt <- function(Z,
     }
 
     # Random selection of treatment eligible units fixed at Z = 1
-    id_fix_Z1 <- foreach::foreach(i = 1:num_focal_unit, .combine = "c", .inorder = TRUE) %dopar% {
-
+    id_fix_Z1 <- NULL
+    for (i in 1:num_focal_unit) {
       if (length(list_Z1[[i]]) == 1) {
 
-        list_Z1[[i]]
+        id_fix_Z1 <- c(id_fix_Z1, list_Z1[[i]])
 
       } else {
 
-        sample(list_Z1[[i]], size = 1)
+        id_fix_Z1 <- c(id_fix_Z1, sample(list_Z1[[i]], size = 1))
 
       }
     }
@@ -366,7 +366,7 @@ find_focal_asgmt <- function(Z,
                  ncol = num_randomization,
                  byrow = TRUE)
 
-      } else if (length(prob) == n){
+      } else if (length(prob) == n) {
 
         focal_asgmt[rand_unit, -1] <-
           t(apply(X = cbind(1 - prob[rand_unit], prob[rand_unit]),
