@@ -1,3 +1,7 @@
+# testinterference 0.1.5
+
+* Bug fix (randomization_test.R).
+
 # testinterference 0.1.4
 
 * Minor updates (find_focal_asgmt.R).

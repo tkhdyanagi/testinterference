@@ -6,10 +6,10 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The **testinterference** package provides tools to test several
-hypotheses about spillover effects. Specifically, the package enables to
-perform randomization tests on whether or not the following null
-hypotheses are plausible:
+The **testinterference** package provides tools to test SUTVA and
+several hypotheses about spillover effects. Specifically, the package
+enables to perform randomization tests on whether or not the following
+null hypotheses are plausible:
 
 - **Fisher**: One’s outcome does not depend on one’s own treatment
   (i.e., Fisher’s sharp null hypothesis).

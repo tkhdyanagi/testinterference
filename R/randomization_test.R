@@ -127,8 +127,8 @@ randomization_test <- function(Y,
       # ACD statistic
       diff <- NULL
 
-      for (g1 in 1:num_group) {
-        for (g2 in g1:num_group) {
+      for (g1 in 1:(num_group - 1)) {
+        for (g2 in (g1 + 1):num_group) {
 
           diff <- c(diff, abs(mean(Y_group[[g1]]) - mean(Y_group[[g2]])))
 
