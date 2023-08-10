@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">testinterference</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -292,21 +292,21 @@ are:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RT1</span><span class="op">$</span><span class="va">pval</span></span>
 <span><span class="co">#&gt;    KW   ACD   OLS </span></span>
-<span><span class="co">#&gt; 0.001 0.003 0.001</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.012 0.019 0.012</span></span></code></pre></div>
 <p>The null hypothesis is rejected at the standard significance level.
 In other words, we find statistical evidence that SUTVA is
 implausible.</p>
 <p>The results of Simes’ correction are:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RT1</span><span class="op">$</span><span class="va">Simes</span></span>
-<span><span class="co">#&gt;  10%   5%   1% </span></span>
-<span><span class="co">#&gt; TRUE TRUE TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt;   10%    5%    1% </span></span>
+<span><span class="co">#&gt;  TRUE  TRUE FALSE</span></span></code></pre></div>
 <p>Here, <code>TRUE</code> indicates the rejection of the null
 hypothesis. Again, the results suggest that SUTVA does not hold.</p>
 <p>We can confirm the numbers of focal units and assignments with:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RT1</span><span class="op">$</span><span class="va">num_focal_unit</span></span>
-<span><span class="co">#&gt; [1] 84</span></span>
+<span><span class="co">#&gt; [1] 36</span></span>
 <span><span class="va">RT1</span><span class="op">$</span><span class="va">num_focal_asgmt</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span></code></pre></div>
 <p>Next, we turn to test whether exposure 2 is correct.</p>
