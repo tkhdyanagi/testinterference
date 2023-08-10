@@ -61,18 +61,40 @@ find_focal_unit <- function(Z,
 
   if (method == "MIS") {
 
-    # Graph for units in N(kappa)
+    # Common-friend graph ------------------------------------------------------
+
+    # Adjacency matrix restricted on N(kappa)
     A_N_kappa <- A[N_kappa, N_kappa]
 
-    g_N_kappa <- igraph::graph_from_adjacency_matrix(adjmatrix = A_N_kappa)
+    # Zero matrix
+    A_common <- matrix(0, nrow = num_N_kappa, ncol = num_N_kappa)
 
-    # Find focal units by the method of MIS via greedy vertex coloring
-    coloring_out <- igraph::greedy_vertex_coloring(graph = g_N_kappa)
+    # Matrix B with (i, j)-th element = "if unit j belongs to i's neighborhood"
+    B_N_kappa <- A_N_kappa
+    diag(B_N_kappa) <- 1
 
+    # Common-friend adjacency matrix
+    for (i in 1:num_N_kappa) {
+      A_common[i, ] <- (B_N_kappa %*% B_N_kappa[i, ] > 0) * 1
+    }
+
+    # Names
+    rownames(A_common) <- colnames(A_common) <- id_N_kappa
+
+    # Common-friend graph
+    G_common <- igraph::graph_from_adjacency_matrix(adjmatrix = A_common)
+
+    # Find focal units by the method of MIS via greedy vertex coloring ---------
+
+    # greedy vertex coloring
+    coloring_out <- igraph::greedy_vertex_coloring(graph = G_common)
+
+    # "Maximum color"
     coloring_max <- which.max(table(coloring_out)) %>%
       names() %>%
       as.integer()
 
+    # Unit ID with "maximum color"
     id_focal_unit <- which(coloring_out == coloring_max) %>%
       names() %>%
       as.integer() %>%

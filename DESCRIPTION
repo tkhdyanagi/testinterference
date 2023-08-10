@@ -1,7 +1,7 @@
 Package: testinterference
 Type: Package
 Title: Randomization Test for the Specification of Interference Structure 
-Version: 0.1.5
+Version: 0.1.6
 Authors@R: c(
     person("Tadao", "Hoshino", email = "thoshino@waseda.jp", role = c("aut", "cph"), comment = c(ORCID = "0000-0001-9484-2943")),
     person("Takahide", "Yanagi", email = "yanagi@econ.kyoto-u.ac.jp", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0003-3975-5518"))
@@ -13,7 +13,7 @@ Description: Examining whether there are treatment spillovers and how to specify
     2. The stable unit treatment value assumption (one's outcome is determined by one's own treatment).
     3. Exposure 1 (one's outcome is determined by whether there is at least one treated unit in one's neighborhood including oneself).
     4. Exposure 2 (one's outcome is determined by one's own treatment and whether there is at least one treated peer).
-    The testing procedures are developed by Hoshino and Yanagi (2023)<doi:10.48550/arXiv.2301.05580>.
+    The testing procedures are developed by Hoshino and Yanagi (2023) <doi:10.48550/arXiv.2301.05580>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

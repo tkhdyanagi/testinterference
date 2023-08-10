@@ -1,3 +1,7 @@
+# testinterference 0.1.6
+
+* Bug fix for the MIS method (find_focal_unit.R). This fix may result in testing results different from previous versions. Please use the latest version.
+
 # testinterference 0.1.5
 
 * Bug fix (randomization_test.R).
