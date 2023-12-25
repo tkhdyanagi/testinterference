@@ -1,0 +1,19 @@
+bibentry(
+  bibtype   = "Article",
+  title     = "Randomization Test for the Specification of Interference Structure",
+  author    = c(person("Tadao", "Hoshino"), person("Takahide", "Yanagi")),
+  url       = "https://doi.org/10.48550/arXiv.2301.05580",
+  doi       = "10.48550/arXiv.2301.05580",
+  journal   = "arXiv",
+  year      = "2023",
+  header    = "To cite the paper that the R testinterference package is based on:\n"
+)
+
+bibentry(
+  bibtype  = "Misc",
+  title    = "testinterference: Randomization Test for the Specification of Interference Structure",
+  author    = c(person("Tadao", "Hoshino"), person("Takahide", "Yanagi")),
+  url      = "https://tkhdyanagi.github.io/testinterference/",
+  year     = "2023",
+  header   = "To cite the R testinterference package:\n"
+)

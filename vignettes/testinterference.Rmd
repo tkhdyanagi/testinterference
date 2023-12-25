@@ -39,7 +39,7 @@ The testing procedures are developed by [Hoshino and Yanagi (2023) "Randomizatio
 Get the package from GitHub:
 
 ```{r, eval = F, echo = T}
-# install.packages("devtools") # if necessary
+# install.packages("devtools") # if needed
 devtools::install_github("tkhdyanagi/testinterference", build_vignettes = TRUE)
 ```
 
@@ -67,9 +67,9 @@ The `testinterference()` function has the following arguments:
    Default is "SUTVA".
    If `hypothesis = "exposure2"`, the user can specify the argument `kappa`.
 - `method`: A character specifying how to find focal units.
-   Options are "MIS", "random", and "manual", 
-   which stand for the method of maximum independent set (MIS), the random selection, and the manual selection.
-   Default is "MIS".
+   Options are "3-net", "2-net", "random", and "manual", 
+   which stand for the 3-net (MIS-G) method, the 2-net (MIS-A) method, the random selection, and the manual selection.
+   Default is "3-net".
    If `method = "random"`, the user can specify the argument `num_focal_unit`.
    If `method = "manual"`, the user must specify the argument `focal_unit`.
 - `design`: A character specifying the randomization design of the original experiment.
@@ -91,7 +91,7 @@ The `testinterference()` function has the following arguments:
    Default is NULL.
 - `num_randomization`: A large positive integer specifying the number of randomization.
    Default is 9999.
-   This argument is not used when `method = "other"`.
+   This argument is not used when `design = "other"`.
 - `strata`: NULL or an $n$-dimensional numerical vector indicating the stratum to which each unit belongs.
    This argument is used only when `design = "stratified"`.
    Default is NULL.
@@ -156,7 +156,7 @@ RT1 <- testinterference(Y                 = data1$Y,
                         Z                 = data1$Z,
                         A                 = data1$A,
                         hypothesis        = "SUTVA",
-                        method            = "MIS",
+                        method            = "3-net",
                         design            = "Bernoulli",
                         prob              = 0.5,
                         focal_unit        = NULL,
@@ -203,7 +203,7 @@ RT2 <- testinterference(Y                 = data1$Y,
                         Z                 = data1$Z,
                         A                 = data1$A,
                         hypothesis        = "exposure2",
-                        method            = "MIS",
+                        method            = "3-net",
                         design            = "Bernoulli",
                         prob              = 0.5,
                         focal_unit        = NULL,
@@ -247,7 +247,7 @@ RT3 <- testinterference(Y                 = data2$Y,
                         Z                 = data2$Z,
                         A                 = data2$A,
                         hypothesis        = "SUTVA",
-                        method            = "MIS",
+                        method            = "3-net",
                         design            = "complete",
                         prob              = NULL,
                         focal_unit        = NULL,

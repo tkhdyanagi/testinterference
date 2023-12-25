@@ -7,7 +7,7 @@
 #' Options are "Fisher", "SUTVA", "exposure1", and "exposure2".
 #' @param method
 #' A character specifying how to specify focal units.
-#' Options are "MIS" and "random".
+#' Options are "3-net", "2-net", and "random".
 #' @param num_focal_unit
 #' A positive scalar specifying the number of focal units.
 #' This argument is used only when `method = "random"`.
@@ -57,9 +57,9 @@ find_focal_unit <- function(Z,
   # Number of units in N(kappa)
   num_N_kappa <- sum(N_kappa)
 
-  # Method of MIS --------------------------------------------------------------
+  # 3-net (MIS-G) --------------------------------------------------------------
 
-  if (method == "MIS") {
+  if (method == "3-net") {
 
     # Common-friend graph ------------------------------------------------------
 
@@ -84,7 +84,7 @@ find_focal_unit <- function(Z,
     # Common-friend graph
     G_common <- igraph::graph_from_adjacency_matrix(adjmatrix = A_common)
 
-    # Find focal units by the method of MIS via greedy vertex coloring ---------
+    # Find focal units via greedy vertex coloring ------------------------------
 
     # greedy vertex coloring
     coloring_out <- igraph::greedy_vertex_coloring(graph = G_common)
@@ -95,6 +95,30 @@ find_focal_unit <- function(Z,
       as.integer()
 
     # Unit ID with "maximum color"
+    id_focal_unit <- which(coloring_out == coloring_max) %>%
+      names() %>%
+      as.integer() %>%
+      sort()
+
+  }
+
+  # 2-net (MIS-A) --------------------------------------------------------------
+
+  if (method == "2-net") {
+
+    # Adjacency matrix restricted on N(kappa)
+    A_N_kappa <- A[N_kappa, N_kappa]
+
+    # Graph
+    g_N_kappa <- igraph::graph_from_adjacency_matrix(adjmatrix = A_N_kappa)
+
+    # Find focal units via greedy vertex coloring
+    coloring_out <- igraph::greedy_vertex_coloring(graph = g_N_kappa)
+
+    coloring_max <- which.max(table(coloring_out)) %>%
+      names() %>%
+      as.integer()
+
     id_focal_unit <- which(coloring_out == coloring_max) %>%
       names() %>%
       as.integer() %>%

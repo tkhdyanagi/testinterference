@@ -104,11 +104,12 @@ errorhandling <- function(Y,
 
   # method ---------------------------------------------------------------------
 
-  if (method != "MIS"    &
+  if (method != "3-net"  &
+      method != "2-net"  &
       method != "random" &
       method != "manual") {
 
-    stop(paste("The argument 'method' must be one of 'MIS', 'random', and 'manual'."))
+    stop(paste("The argument 'method' must be one of '3-net', '2-net', 'random', and 'manual'."))
 
   }
 

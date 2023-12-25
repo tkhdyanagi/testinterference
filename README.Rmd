@@ -37,7 +37,7 @@ The testing procedures are developed by [Hoshino and Yanagi (2023) "Randomizatio
 Get the package from GitHub:
 
 ```{r, eval = F, echo = T}
-# install.packages("devtools") # if necessary
+# install.packages("devtools") # if needed
 devtools::install_github("tkhdyanagi/testinterference", build_vignettes = TRUE)
 ```
 

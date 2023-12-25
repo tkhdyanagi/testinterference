@@ -9,7 +9,7 @@ testinterference(
   Z = NULL,
   A = NULL,
   hypothesis = "SUTVA",
-  method = "MIS",
+  method = "3-net",
   design = "complete",
   prob = NULL,
   focal_unit = NULL,
@@ -41,9 +41,10 @@ Default is "SUTVA".
 If `hypothesis = "exposure2"`, the user can specify the argument `kappa`.}
 
 \item{method}{A character specifying how to find focal units.
-Options are "MIS", "random", and "manual", which stand for the method of
-maximum independent sets, the random selection, and the manual selection.
-Default is "MIS".
+Options are "3-net", "2-net", "random", and "manual",
+which stand for the 3-net (MIS-G) method, the 2-net (MIS-A) method,
+the random selection, and the manual selection.
+Default is "3-net".
 If `method = "random"`, the user can specify the argument `num_focal_unit`.
 If `method = "manual"`, the user must specify the argument `focal_unit`.}
 
@@ -135,7 +136,7 @@ test <- testinterference(Y = data$Y,
                          Z = data$Z,
                          A = data$A,
                          hypothesis = "SUTVA",
-                         method = "MIS",
+                         method = "3-net",
                          design = "complete",
                          num_randomization = 999,
                          cores = 1)

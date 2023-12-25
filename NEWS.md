@@ -1,3 +1,7 @@
+# testinterference 0.2.0
+
+* Updated options for "method". The new options are "3-net", "2-net", "random", and "manual". Default is "3-net", which corresponds to the option "MIS" in version 0.1.6.
+
 # testinterference 0.1.6
 
 * Bug fix for the MIS method (find_focal_unit.R). This fix may result in testing results different from previous versions. Please use the latest version.

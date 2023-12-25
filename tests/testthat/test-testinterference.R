@@ -15,7 +15,7 @@ Y                 <- data$Y
 Z                 <- data$Z
 A                 <- data$A
 hypothesis        <- "SUTVA"
-method            <- "MIS"
+method            <- "3-net"
 design            <- "complete"
 prob              <- NULL
 focal_unit        <- NULL
@@ -110,7 +110,7 @@ expect_error(testinterference(Y                 = Y,
                               zmatrix           = zmatrix,
                               kappa             = kappa,
                               cores             = cores),
-             "The argument 'method' must be one of 'MIS', 'random', and 'manual'.")
+             "The argument 'method' must be one of '3-net', '2-net', 'random', and 'manual'.")
 
 # design -----------------------------------------------------------------------
 

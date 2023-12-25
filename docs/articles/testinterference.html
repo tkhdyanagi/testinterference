@@ -8,8 +8,8 @@
 <meta name="description" content="testinterference">
 <title>Getting Started with the testinterference Package • testinterference</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Getting Started with the testinterference Package">
 <meta property="og:description" content="testinterference">
@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">testinterference</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -112,7 +112,7 @@ structure”</a>.</p>
 </h2>
 <p>Get the package from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools") # if necessary</span></span>
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools") # if needed</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"tkhdyanagi/testinterference"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -153,12 +153,12 @@ Hoshino and Yanagi (2023). Default is “SUTVA”. If
 <code>kappa</code>.</li>
 <li>
 <code>method</code>: A character specifying how to find focal units.
-Options are “MIS”, “random”, and “manual”, which stand for the method of
-maximum independent set (MIS), the random selection, and the manual
-selection. Default is “MIS”. If <code>method = "random"</code>, the user
-can specify the argument <code>num_focal_unit</code>. If
-<code>method = "manual"</code>, the user must specify the argument
-<code>focal_unit</code>.</li>
+Options are “3-net”, “2-net”, “random”, and “manual”, which stand for
+the 3-net (MIS-G) method, the 2-net (MIS-A) method, the random
+selection, and the manual selection. Default is “3-net”. If
+<code>method = "random"</code>, the user can specify the argument
+<code>num_focal_unit</code>. If <code>method = "manual"</code>, the user
+must specify the argument <code>focal_unit</code>.</li>
 <li>
 <code>design</code>: A character specifying the randomization design
 of the original experiment. Options are “Bernoulli”, “complete”,
@@ -187,7 +187,7 @@ the number of focal units. This argument is used only when
 <li>
 <code>num_randomization</code>: A large positive integer specifying
 the number of randomization. Default is 9999. This argument is not used
-when <code>method = "other"</code>.</li>
+when <code>design = "other"</code>.</li>
 <li>
 <code>strata</code>: NULL or an <span class="math inline">\(n\)</span>-dimensional numerical vector indicating
 the stratum to which each unit belongs. This argument is used only when
@@ -272,7 +272,7 @@ where SUTVA does not hold.</p>
 <span>                        Z                 <span class="op">=</span> <span class="va">data1</span><span class="op">$</span><span class="va">Z</span>,</span>
 <span>                        A                 <span class="op">=</span> <span class="va">data1</span><span class="op">$</span><span class="va">A</span>,</span>
 <span>                        hypothesis        <span class="op">=</span> <span class="st">"SUTVA"</span>,</span>
-<span>                        method            <span class="op">=</span> <span class="st">"MIS"</span>,</span>
+<span>                        method            <span class="op">=</span> <span class="st">"3-net"</span>,</span>
 <span>                        design            <span class="op">=</span> <span class="st">"Bernoulli"</span>,</span>
 <span>                        prob              <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>                        focal_unit        <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -292,21 +292,21 @@ are:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RT1</span><span class="op">$</span><span class="va">pval</span></span>
 <span><span class="co">#&gt;    KW   ACD   OLS </span></span>
-<span><span class="co">#&gt; 0.001 0.003 0.001</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.012 0.019 0.012</span></span></code></pre></div>
 <p>The null hypothesis is rejected at the standard significance level.
 In other words, we find statistical evidence that SUTVA is
 implausible.</p>
 <p>The results of Simes’ correction are:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RT1</span><span class="op">$</span><span class="va">Simes</span></span>
-<span><span class="co">#&gt;  10%   5%   1% </span></span>
-<span><span class="co">#&gt; TRUE TRUE TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt;   10%    5%    1% </span></span>
+<span><span class="co">#&gt;  TRUE  TRUE FALSE</span></span></code></pre></div>
 <p>Here, <code>TRUE</code> indicates the rejection of the null
 hypothesis. Again, the results suggest that SUTVA does not hold.</p>
 <p>We can confirm the numbers of focal units and assignments with:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RT1</span><span class="op">$</span><span class="va">num_focal_unit</span></span>
-<span><span class="co">#&gt; [1] 84</span></span>
+<span><span class="co">#&gt; [1] 36</span></span>
 <span><span class="va">RT1</span><span class="op">$</span><span class="va">num_focal_asgmt</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span></code></pre></div>
 <p>Next, we turn to test whether exposure 2 is correct.</p>
@@ -316,7 +316,7 @@ hypothesis. Again, the results suggest that SUTVA does not hold.</p>
 <span>                        Z                 <span class="op">=</span> <span class="va">data1</span><span class="op">$</span><span class="va">Z</span>,</span>
 <span>                        A                 <span class="op">=</span> <span class="va">data1</span><span class="op">$</span><span class="va">A</span>,</span>
 <span>                        hypothesis        <span class="op">=</span> <span class="st">"exposure2"</span>,</span>
-<span>                        method            <span class="op">=</span> <span class="st">"MIS"</span>,</span>
+<span>                        method            <span class="op">=</span> <span class="st">"3-net"</span>,</span>
 <span>                        design            <span class="op">=</span> <span class="st">"Bernoulli"</span>,</span>
 <span>                        prob              <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>                        focal_unit        <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -360,7 +360,7 @@ randomization. To consider the case without interference, we specify
 <span>                        Z                 <span class="op">=</span> <span class="va">data2</span><span class="op">$</span><span class="va">Z</span>,</span>
 <span>                        A                 <span class="op">=</span> <span class="va">data2</span><span class="op">$</span><span class="va">A</span>,</span>
 <span>                        hypothesis        <span class="op">=</span> <span class="st">"SUTVA"</span>,</span>
-<span>                        method            <span class="op">=</span> <span class="st">"MIS"</span>,</span>
+<span>                        method            <span class="op">=</span> <span class="st">"3-net"</span>,</span>
 <span>                        design            <span class="op">=</span> <span class="st">"complete"</span>,</span>
 <span>                        prob              <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        focal_unit        <span class="op">=</span> <span class="cn">NULL</span>,</span>

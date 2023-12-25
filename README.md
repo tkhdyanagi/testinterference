@@ -29,7 +29,7 @@ structure”](https://doi.org/10.48550/arXiv.2301.05580).
 Get the package from GitHub:
 
 ``` r
-# install.packages("devtools") # if necessary
+# install.packages("devtools") # if needed
 devtools::install_github("tkhdyanagi/testinterference", build_vignettes = TRUE)
 ```
 
